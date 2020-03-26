@@ -1,8 +1,10 @@
 import pathlib
 import re
 
+from Static import stop_words
 from git import Repo
 from nltk.tokenize import word_tokenize
+from nltk.stem import PorterStemmer
 
 
 class Localizer:
@@ -37,17 +39,21 @@ class Localizer:
 
         for item in self.splitted_file:
             item = item.lower().strip()
-            if item.startswith('r.'):
+            if item.__contains__('.') or len(item) < 3:
                 continue
-            elif len(item) < 3:
-                continue
-            else:
+            elif item not in stop_words:
                 self.clean_splitted_file.append(item)
+
+    def stemmer(self):
+        ps = PorterStemmer()
+        self.clean_splitted_file = [ps.stem(word) for word in self.clean_splitted_file]
 
     def run(self):
         self.read_file()
         self.remove_comment_import()
         self.tokenize()
+        self.stemmer()
+        print(self.clean_splitted_file)
 
 
 obj = Localizer()
